@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Năm Mới 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+            /* Thay đổi màu nền thành đỏ Retro */
+            background-color: #a62c2b; 
+            background: radial-gradient(circle, #bc2f2e 0%, #8b1e1d 100%);
+        }
+
+        #cas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Container chính */
+        .lixi-container {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            height: 280px;
+            perspective: 1500px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* Bao lì xì */
+        .lixi-envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #d32f2f;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            z-index: 5;
+            border: 2px solid #ffca28;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lixi-envelope::after {
+            content: "福";
+            font-size: 80px;
+            color: #ffca28;
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
+        /* Nắp lì xì */
+        .lixi-lid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: #b71c1c;
+            border-radius: 10px 10px 50% 50%;
+            z-index: 6;
+            transform-origin: top;
+            transition: transform 0.5s ease-in-out;
+            border-bottom: 2px solid #ffca28;
+        }
+
+        /* Tờ giấy lời chúc */
+        .wish-card {
+            position: absolute;
+            top: 10px;
+            left: 5%;
+            width: 90%;
+            height: 90%;
+            background: #fff9c4;
+            border-radius: 5px;
+            z-index: 4;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            border: 2px solid #fbc02d;
+            transition: opacity 0.3s;
+        }
+
+        .wish-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.2rem;
+            color: #b71c1c;
+            line-height: 1.6;
+        }
+
+        /* Hiệu ứng khi mở */
+        .opened .lixi-lid {
+            transform: rotateX(160deg);
+            z-index: 3;
+        }
+
+        .opened .wish-card {
+            opacity: 1;
+            z-index: 20;
+            animation: slideAndZoom 1.5s forwards cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @keyframes slideAndZoom {
+            0% {
+                transform: translateY(0) scale(0.8);
+                opacity: 0;
+            }
+            30% {
+                transform: translateY(-100px) scale(0.9);
+                opacity: 1;
+            }
+            100% {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 70vw;
+                height: 60vh;
+                transform: translate(-50%, -50%) scale(1);
+                font-size: 2rem;
+            }
+        }
+
+        .opened .wish-text {
+            transition: font-size 1s;
+            font-size: 2rem;
+        }
+
+        .instruction {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            z-index: 5;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        #close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #b71c1c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            display: none;
+            border-radius: 5px;
+            font-family: sans-serif;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="cas"></canvas>
+
+    <div class="lixi-container" id="lixi">
+        <div class="lixi-lid"></div>
+        <div class="lixi-envelope"></div>
+        <div class="wish-card" id="card">
+            <button id="close-btn">Đóng X</button>
+            <div class="wish-text" id="wish-output"></div>
+        </div>
+    </div>
+
+    <div class="instruction">Nhấp vào bao lì xì để nhận lộc đầu năm!</div>
+
+    <audio id="fireworkSound" src="tieng_phao_hoa_no-www_tiengdong_com.mp3"></audio>
+
+    <script>
+        const wishes = [
+            "Năm mới chúc mọi điều hanh thông, công việc thuận lợi, sự nghiệp thăng tiến.",
+            "Chúc mừng năm mới - An khang thịnh vượng, vạn sự như ý!",
+            "Năm mới dồi dào sức khỏe, hạnh phúc đong đầy, tiền tài viên mãn.",
+            "Vạn sự hanh thông, công việc thuận lợi, sự nghiệp thăng tiến.",
+            "Chúc mừng năm mới: Đa lộc, đa tài, đa phú quý."
+        ];
+
+        const lixi = document.getElementById('lixi');
+        const wishOutput = document.getElementById('wish-output');
+        const sound = document.getElementById('fireworkSound');
+        const closeBtn = document.getElementById('close-btn');
+        let isOpened = false;
+
+        lixi.addEventListener('click', function(e) {
+            if (e.target.id === 'close-btn') return;
+
+            if (!isOpened) {
+                const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
+                wishOutput.innerText = randomWish;
+
+                this.classList.add('opened');
+                isOpened = true;
+
+                sound.play();
+                startCelebration();
+                
+                setTimeout(() => { closeBtn.style.display = 'block'; }, 1500);
+            }
+        });
+
+        closeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            lixi.classList.remove('opened');
+            isOpened = false;
+            closeBtn.style.display = 'none';
+            sound.pause();
+            sound.currentTime = 0;
+        });
+
+        // --- Logic Pháo Hoa ---
+        const canvas = document.getElementById('cas');
+        const ctx = canvas.getContext('2d');
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, hue) {
+                this.x = x;
+                this.y = y;
+                this.hue = hue;
+                this.alpha = 1;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 8,
+                    y: (Math.random() - 0.5) * 8
+                };
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${this.hue}, 100%, 50%, ${this.alpha})`;
+                ctx.fill();
+            }
+            update() {
+                this.velocity.y += 0.05;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01;
+            }
+        }
+
+        let particles = [];
+        function createFirework(x, y) {
+            const hue = Math.random() * 360;
+            for(let i=0; i<60; i++) {
+                particles.push(new Particle(x, y, hue));
+            }
+        }
+
+        function startCelebration() {
+            const timer = setInterval(() => {
+                if(!isOpened) clearInterval(timer);
+                createFirework(Math.random() * canvas.width, Math.random() * canvas.height * 0.5);
+            }, 600);
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                if (p.alpha <= 0) particles.splice(i, 1);
+                else {
+                    p.update();
+                    p.draw();
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
